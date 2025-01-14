@@ -12,6 +12,8 @@ export const AskTable = ({ asks }: { asks: [string, string][] }) => {
     (acc, [_, quantity]) => acc + Number(quantity),
     0
   );
+
+  asksWithTotal.reverse();
   return (
     <div>
       {asksWithTotal.map(([price, quantity, total]) => (
