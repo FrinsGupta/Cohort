@@ -121,9 +121,13 @@ wss.on("connection", (ws) => {
     if (parsedMessage.type === "SUBSCRIBE") {
       subscripedUsers[id].rooms.push(parsedMessage.interestedRoomId); // One Added in rooms
       if (oneUserSucbscribedTo(parsedMessage.interestedRoomId)) {
-        console.log("Subscribing on the pub sub to room " + parsedMessage.interestedRoomId);
+        // Checking if this is the first connection for this roomId
+        console.log(
+          "Subscribing on the pub sub to room " + parsedMessage.interestedRoomId
+        );
 
-        subscribeClient.subscribe(parsedMessage.interestedRoomId, (msg) => { // Checking if this is the first connection for this roomId
+        subscribeClient.subscribe(parsedMessage.interestedRoomId, (msg) => {
+          // this callback gets executed whenever this roomId receives a message
           const parsedMessage = JSON.parse(msg);
           Object.keys(subscripedUsers).forEach((userId) => {
             const { ws, rooms } = subscripedUsers[userId];
@@ -136,16 +140,21 @@ wss.on("connection", (ws) => {
     }
 
     if (parsedMessage.type === "UNSUBSCRIBE") {
-      subscripedUsers[id].rooms = subscripedUsers[id].rooms.filter(  // removing previously interested roomId from rooms
+      subscripedUsers[id].rooms = subscripedUsers[id].rooms.filter(
+        // removing previously interested roomId from rooms
         (x) => x !== parsedMessage.interestedRoomId
       );
-      if (lastPersonLeftRoom(parsedMessage.interestedRoomId)) {  // checking is this the last person to left the room  
-        console.log("Unsubscribing from the pub sub on room"+ parsedMessage.interestedRoomId);
+      if (lastPersonLeftRoom(parsedMessage.interestedRoomId)) {
+        // checking is this the last person to left the room
+        console.log(
+          "Unsubscribing from the pub sub on room" +
+            parsedMessage.interestedRoomId
+        );
         subscribeClient.unsubscribe(parsedMessage.interestedRoomId);
       }
     }
 
-    if ((parsedMessage.type === "sendMessage")) {
+    if (parsedMessage.type === "sendMessage") {
       const roomId = parsedMessage.roomId;
       const message = parsedMessage.message;
 
@@ -162,13 +171,15 @@ wss.on("connection", (ws) => {
 });
 
 const oneUserSucbscribedTo = (roomId: string) => {
+  // function to check was this the first person subscribe the room
   let totalInterestedPeople = 0;
   Object.keys(subscripedUsers).map((userId) => {
+    // return array of all keys of subscriptedUsers object
     if (subscripedUsers[userId].rooms.includes(roomId)) {
       totalInterestedPeople++;
     }
   });
-  if (totalInterestedPeople == 1) {  
+  if (totalInterestedPeople == 1) {
     return true;
   }
   return false;
