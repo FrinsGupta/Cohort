@@ -1,6 +1,6 @@
 import { WebSocketServer, WebSocket } from "ws";
 
-const wss = new WebSocketServer({ port: 8080 });
+const wss = new WebSocketServer({ port: 9090 });
 
 // Example - 1  (Simple WebServer Connetion)
 
@@ -120,6 +120,7 @@ wss.on("connection", (ws) => {
 
     if (parsedMessage.type === "SUBSCRIBE") {
       subscripedUsers[id].rooms.push(parsedMessage.interestedRoomId); // One Added in rooms
+      console.log(subscripedUsers[id]);
       if (oneUserSucbscribedTo(parsedMessage.interestedRoomId)) {
         // Checking if this is the first connection for this roomId
         console.log(
@@ -132,7 +133,7 @@ wss.on("connection", (ws) => {
           Object.keys(subscripedUsers).forEach((userId) => {
             const { ws, rooms } = subscripedUsers[userId];
             if (rooms.includes(parsedMessage.interestedRoomId)) {
-              ws.send(parsedMessage.message);
+              ws.send(parsedMessage.message); // sending message on users specific websocket
             }
           });
         });
@@ -144,6 +145,7 @@ wss.on("connection", (ws) => {
         // removing previously interested roomId from rooms
         (x) => x !== parsedMessage.interestedRoomId
       );
+      console.log(subscripedUsers[id]);
       if (lastPersonLeftRoom(parsedMessage.interestedRoomId)) {
         // checking is this the last person to left the room
         console.log(
@@ -202,4 +204,4 @@ const randomId = () => {
   return Math.random();
 };
 
-console.log("WebSocket server is running on ws://localhost:8080");
+console.log("WebSocket server is running on ws://localhost:9090");
