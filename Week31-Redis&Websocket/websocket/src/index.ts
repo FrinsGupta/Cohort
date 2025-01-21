@@ -120,7 +120,6 @@ wss.on("connection", (ws) => {
 
     if (parsedMessage.type === "SUBSCRIBE") {
       subscripedUsers[id].rooms.push(parsedMessage.interestedRoomId); // One Added in rooms
-      console.log(subscripedUsers[id]);
       if (oneUserSucbscribedTo(parsedMessage.interestedRoomId)) {
         // Checking if this is the first connection for this roomId
         console.log(
@@ -145,7 +144,6 @@ wss.on("connection", (ws) => {
         // removing previously interested roomId from rooms
         (x) => x !== parsedMessage.interestedRoomId
       );
-      console.log(subscripedUsers[id]);
       if (lastPersonLeftRoom(parsedMessage.interestedRoomId)) {
         // checking is this the last person to left the room
         console.log(

@@ -14,6 +14,7 @@ wss.on("listening", () => {
 const users: { [key: string]: { ws: WebSocket; rooms: string[] } } = {};
 
 wss.on("connection", (ws) => {
+  // ws: Represents the current WebSocket connection between the server and a single client.
   const id = Math.random();
   users[id] = {
     ws: ws,
