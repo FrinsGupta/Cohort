@@ -181,7 +181,11 @@ export class Engine {
 
       RedisManager.getInstance().publishMessage(`depth@${market}`, {
         stream: `depth@${market}`,
-        data: {},
+        data: {
+          a: updatedAsks ? [updatedAsks] : [],
+          b: updatedBids,
+          e: "depth",
+        },
       });
     }
   }
