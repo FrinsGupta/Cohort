@@ -1,3 +1,4 @@
+import { Order } from "../trade/Orderbook";
 export type MessageToApi =
   | {
       type: "DEPTH";
@@ -15,7 +16,7 @@ export type MessageToApi =
           price: string;
           qty: number;
           tradeId: number;
-        };
+        }[];
       };
     }
   | {
