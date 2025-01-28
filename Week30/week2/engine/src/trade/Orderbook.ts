@@ -71,6 +71,16 @@ export class Orderbook {
     }
   }
 
+  getSnapshot(){
+    return {
+      baseAsset: this.baseAsset,
+      bids: this.bids,
+      asks: this.asks,
+      lastTradeId: this.lastTradeId,
+      currentPrice: this.currentPrice
+    }
+  }
+
   matchBid(order: Order): { executedQty: number; fills: Fill[] } {
     let executedQty: number = 0;
     const fills: Fill[] = [];

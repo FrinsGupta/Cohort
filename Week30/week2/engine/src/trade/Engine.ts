@@ -2,6 +2,7 @@ import { CREATE_ORDER, MessageFromApi, CANCEL_ORDER, GET_OPEN_ORDERS, GET_DEPTH 
 import { Orderbook, Fill, Order } from "./Orderbook";
 import { RedisManager } from "../RedisManager";
 import { TRADE_ADDED, ORDER_UPDATE } from "../types";
+import fs from "fs";
 
 export const BASE_CURRENCY = "INR";
 interface UserBalance {
@@ -13,6 +14,27 @@ interface UserBalance {
 export class Engine {
   private orderbooks: Orderbook[] = [];
   private balances: Map<string, UserBalance> = new Map();
+
+  constructor() {
+    let snapshot = null;
+    try {
+      if (process.env.WITH_SNAPSHOT) {
+        snapshot = fs.readFileSync("./snapshot.json");
+      }
+    } catch (e) {
+      console.log("No snapshot found");
+    }
+
+    if (snapshot) {
+      const snapshotSnapshot = JSON.parse(snapshot.toString());
+      this.orderbooks = snapshotSnapshot.orderbooks.map((o: Orderbook) => {
+        return new Orderbook(o.baseAsset, o.bids, o.asks, o.lastTradeId, o.currentPrice);
+      });
+      this.balances = new Map(snapshotSnapshot.balances);
+    } else {
+      this.orderbooks = [new Orderbook(`BTC`, [], [], 0, 0)];
+    }
+  }
   public process({ message, clientId }: { message: MessageFromApi; clientId: string }) {
     switch (message.type) {
       case CREATE_ORDER:
