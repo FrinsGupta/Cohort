@@ -1,7 +1,8 @@
-import { Ticker } from "./types";
+import { log } from "console";
+import { Ticker, Trade } from "./types";
 
-// export const BASE_URL = "wss://ws.backpack.exchange/"
-export const BASE_URL = "ws://localhost:3001"
+export const BASE_URL = "wss://ws.backpack.exchange/"
+// export const BASE_URL = "ws://localhost:8080"
 
 export class SignalingManager {
     private ws: WebSocket;
@@ -35,20 +36,40 @@ export class SignalingManager {
         }
         this.ws.onmessage = (event) => {
             const message = JSON.parse(event.data);
-            const type = message.data.e;
+            // console.log(this.callbacks);
+            
+            const type = message?.data?.e;
+            // console.log(type);
+            
             if (this.callbacks[type]) {
-                this.callbacks[type].forEach(({ callback }) => {
+                this.callbacks[type].forEach(({ callback }: any) => {
                     if (type === "ticker") {
                         const newTicker: Partial<Ticker> = {
-                            lastPrice: message.data.c,
+                            firstPrice: message.data.x,
                             high: message.data.h,
+                            lastPrice: message.data.c,
                             low: message.data.l,
-                            volume: message.data.v,
-                            quoteVolume: message.data.V,
+                            priceChangePercent: message.data.P,
+                            priceChange: message.data.p,
+                            quoteVolume: message.data.q,
                             symbol: message.data.s,
+                            trades: message.data.n,
+                            volume: message.data.v,
                         }
-                        console.log(newTicker);
+                        // console.log(newTicker);
                         callback(newTicker);
+                   }
+                   
+                    if (type === "trade") {
+                        const newTrade: Trade = {
+                            id: message.data.t,
+                            isBuyerMaker: message.data.m,
+                            price: message.data.p,
+                            quantity: message.data.q,
+                            timestamp: message.data.T,
+                        }
+                        // console.log(newTrade);
+                        callback(newTrade);
                    }
                    if (type === "depth") {
                         // const newTicker: Partial<Ticker> = {
@@ -63,6 +84,9 @@ export class SignalingManager {
                         // callback(newTicker);
                         const updatedBids = message.data.b;
                         const updatedAsks = message.data.a;
+                        // console.log([...updatedBids,...updatedAsks]);
+                        // console.log(updatedBids);
+                        
                         callback({ bids: updatedBids, asks: updatedAsks });
                     }
                 });
@@ -90,7 +114,7 @@ export class SignalingManager {
 
     async deRegisterCallback(type: string, id: string) {
         if (this.callbacks[type]) {
-            const index = this.callbacks[type].findIndex(callback => callback.id === id);
+            const index = this.callbacks[type].findIndex((callback: {id: string}) => callback.id === id);
             if (index !== -1) {
                 this.callbacks[type].splice(index, 1);
             }

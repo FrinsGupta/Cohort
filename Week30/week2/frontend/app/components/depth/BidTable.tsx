@@ -1,7 +1,12 @@
 
 export const BidTable = ({ bids }: {bids: [string, string][]}) => {
+    // console.log(bids);
+    
     let currentTotal = 0; 
+    bids.sort((x, y) => (Number(y[0]) > Number(x[0]) ? -1 : 1)).reverse();
     const relevantBids = bids.slice(0, 15);
+    // console.log(relevantBids);
+    
     const bidsWithTotal: [string, string, number][] = relevantBids.map(([price, quantity]) => [price, quantity, currentTotal += Number(quantity)]);
     const maxTotal = relevantBids.reduce((acc, [_, quantity]) => acc + Number(quantity), 0);
 

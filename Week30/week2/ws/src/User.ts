@@ -1,5 +1,7 @@
 import { WebSocket } from "ws";
 import { IncomingMessage } from "./types/in";
+import { SubscriptionManager } from "./SubscriptionManager";
+import { OutgoingMessage } from "./types/out";
 export class User {
   private static instance: User;
   private id: string;
@@ -15,6 +17,10 @@ export class User {
   //     }
   //     return this.instance;
   //   }
+ 
+  emit(message: OutgoingMessage) {
+    this.ws.send(JSON.stringify(message));
+  }
 
   private addListner() {
     this.ws.on("message", (message: string) => {

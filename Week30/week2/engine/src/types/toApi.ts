@@ -1,6 +1,21 @@
 import { Order } from "../trade/Orderbook";
 export type MessageToApi =
   | {
+      type: "TICKERS";
+      payload: {
+        firstPrice: string;
+        high: string;
+        lastPrice: string;
+        low: string;
+        priceChange: string;
+        priceChangePercent: string;
+        quoteVolume: string;
+        symbol: string;
+        trades: string;
+        volume: string;
+      }[];
+    }
+  | {
       type: "DEPTH";
       payload: {
         bids: [string, string][];

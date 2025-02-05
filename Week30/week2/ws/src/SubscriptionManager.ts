@@ -1,4 +1,5 @@
 import { createClient, RedisClientType } from "redis";
+import { UserManager } from "./UserManager";
 
 export class SubscriptionManager {
   private static instance: SubscriptionManager;
@@ -31,9 +32,19 @@ export class SubscriptionManager {
       (this.reverseSubscriptions.get(subscription) || []).concat(id)
     );
     if (this.reverseSubscriptions.get(subscription)?.length == 1) {
-      this.redisClient.subscribe(subscription, this.redisCallback());
+      this.redisClient.subscribe(subscription, this.redisCallbackHandler);
     }
   }
+
+  private redisCallbackHandler = (message: string, channel: string) => {
+    // Message broadCasting function
+    const parsedMessage = JSON.parse(message);
+    this.reverseSubscriptions.get(channel)?.forEach(
+      (
+        s // gets all the user interested in the specific roomId
+      ) => UserManager.getInstance().getUser(s)?.emit(parsedMessage) // webSocket - sending message through user's ws if the user exists on webSocket connection
+    );
+  };
 
   public unsubscribe(id: string, subscription: string) {
     if (!this.subscriptions.get(id)?.includes(subscription)) {
@@ -59,5 +70,10 @@ export class SubscriptionManager {
       this.reverseSubscriptions.delete(subscription);
       this.redisClient.unsubscribe(subscription);
     }
+  }
+
+  public userLeft(userId: string) {
+    console.log("user left " + userId);
+    this.subscriptions.get(userId)?.forEach((s) => this.unsubscribe(userId, s));
   }
 }

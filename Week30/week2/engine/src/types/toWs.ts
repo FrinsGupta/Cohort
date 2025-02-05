@@ -3,13 +3,16 @@
 export type TickerUpdateMessage = {
   stream: string;
   data: {
-    c?: string;
-    h?: string;
-    l?: string;
-    v?: string;
-    V?: string;
-    s?: string;
-    id: number;
+    x: string;
+    h: string;
+    c: string;
+    l: string;
+    P: string;
+    p: string;
+    q: string;
+    s: string;
+    n: string;
+    v: string;
     e: "ticker";
   };
 };
